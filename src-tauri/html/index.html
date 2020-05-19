@@ -1,0 +1,137 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <!-- Bootstrap core CSS -->
+    <link href="js/utils/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="" rel="stylesheet"> -->
+
+    <!-- Favicons -->
+
+    <link rel="icon" href="static/imgs/run.ico">
+
+    <meta name="theme-color" content="#563d7c">
+
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .container {
+            max-width: 960px;
+        }
+
+        .lh-condensed {
+            line-height: 1.25;
+        }
+    </style>
+    <!-- Custom styles for this template -->
+</head>
+
+<body class="bg-light">
+    <button id='imgbtn'>larger</button>
+    <button id='iframebtn'>iframeswitch</button>
+    <img id='img' src="imgs/1.gif" alt="">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 order-md-1">
+                <h4 class="mb-3">搜索条件设定</h4>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="target">条件</label>
+                        <input type="text" class="form-control" id="target" placeholder="查询条件" value="" required=""
+                            list="targetlist">
+
+                        <datalist id="targetlist">
+
+                        </datalist>
+                    </div>
+
+
+                </div>
+
+
+
+
+
+                <br>
+                <div class="error"></div>
+                <button id="search_btn" class="btn btn-primary btn-lg btn-block" type="submit">查询结果</button>
+            </div>
+        </div>
+        <div id="response"></div>
+
+
+    </div>
+    <iframe id='iframe' src="http://10.6.1.152:8001/device/?type=SB-QN-176" frameborder="1" width="1280" height="720"></iframe>
+
+    <script src="js/utils/jquery.js"></script>
+    <script src="js/utils/bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/utils/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="js/search.js"></script>
+
+    <script>
+        function registerResponse(response) {
+            document.getElementById('response').innerHTML = typeof response === 'object'
+                ? JSON.stringify(response)
+                : response
+        }
+
+        function addClickEnterHandler(button, input, handler) {
+            button.addEventListener('click', handler)
+            input.addEventListener('keyup', function (e) {
+                if (e.keyCode === 13) {
+                    handler()
+                }
+            })
+        }
+
+        window.tauri.listen('rust-event', function (res) {
+            var data = JSON.stringify(res["payload"]["data"])
+            document.getElementById('response').innerHTML = data
+        })
+
+
+
+
+        document.getElementById('search_btn').addEventListener('click', function () {
+            var input = document.getElementById('target')
+            window.tauri.emit('js-event', input.value)
+        })
+
+        document.getElementById('imgbtn').addEventListener('click', function () {
+            var img = document.getElementById('img')
+            document.getElementById('response').innerHTML = img
+            img.height = img.height + 20;
+            img.width = img.width + 20;
+        })
+
+        document.getElementById('iframebtn').addEventListener('click', function () {
+            var frm = document.getElementById('iframe')
+            document.getElementById('response').innerHTML = frm.src
+            if (frm.src == "http://10.6.1.152:8001/device/?type=SB-QN-176"){ 
+                frm.src = "./index/index.html"
+               
+            }else{
+                frm.src = "http://10.6.1.152:8001/device/?type=SB-QN-176"
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
